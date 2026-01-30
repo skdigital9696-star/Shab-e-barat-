@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shab-e-Barat Mubarak</title>
+
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:Arial, sans-serif;
+  overflow:hidden;
+  height:100vh;
+  position:relative;
+  text-align:center;
+}
+
+h1{
+  margin-top:20px;
+  color:gold;
+  text-shadow:0 0 15px gold, 0 0 30px orange;
+  font-size:2.5em;
+  position:relative;
+  z-index:2;
+}
+
+.gif img{
+  width:220px;
+  margin:20px auto;
+  display:block;
+  border-radius:15px;
+  box-shadow:0 0 30px gold;
+  position:relative;
+  z-index:2;
+}
+
+/* ---------- Floating Banner ---------- */
+#adsterraBanner{
+  width:100%;
+  max-width:728px;
+  position:fixed;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:3;
+}
+
+/* ---------- Message Box Overlay ---------- */
+.box{
+  width:90%;
+  max-width:400px;
+  margin:20px auto;
+  background:rgba(0,0,0,0.5);
+  padding:15px;
+  border-radius:15px;
+  position:relative;
+  z-index:2;
+}
+
+textarea{
+  width:100%;
+  height:90px;
+  border-radius:10px;
+  border:none;
+  padding:10px;
+  font-size:15px;
+}
+
+button{
+  margin-top:15px;
+  padding:10px 20px;
+  border:none;
+  border-radius:25px;
+  background:gold;
+  font-size:16px;
+  cursor:pointer;
+}
+
+#show{
+  margin-top:15px;
+  background:#111;
+  padding:10px;
+  border-radius:10px;
+  display:none;
+}
+
+/* ---------- FIREWORKS ---------- */
+canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:1;
+}
+
+/* Sparkles */
+.sparkle{
+  position:absolute;
+  width:5px;
+  height:5px;
+  background:gold;
+  border-radius:50%;
+  opacity:0.8;
+  pointer-events:none;
+  animation:twinkle 1s infinite;
+}
+
+@keyframes twinkle{
+  0%,100%{opacity:0.8; transform: scale(1);}
+  50%{opacity:0.2; transform: scale(2);}
+}
+</style>
+</head>
+
+<body>
+
+<h1>🌙 Shab-e-Barat Mubarak 🌙</h1>
+
+<div class="gif">
+  <img src="unnamed.gif" alt="Shab-e-Barat GIF">
+</div>
+
+<!-- ---------- Floating Adsterra Banner ---------- -->
+<div id="adsterraBanner">
+  <script async="async" data-cfasync="false" src="https://pl28477642.effectivegatecpm.com/d3d761a8cf42354d87443fb0a9d997a6/invoke.js"></script>
+  <div id="container-d3d761a8cf42354d87443fb0a9d997a6"></div>
+</div>
+
+<div class="box">
+  <p>💖 Apne dil ki baat likhiye</p>
+  <textarea id="msg" placeholder="Yahan message likhein..."></textarea>
+  <br>
+  <button onclick="share()">📲 Share</button>
+  <div id="show"></div>
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<script>
+// ---------- MESSAGE READ ----------
+const q = new URLSearchParams(location.search);
+const m = q.get("msg");
+
+if(m){
+  const d = document.getElementById("show");
+  d.style.display="block";
+  d.innerText = decodeURIComponent(m);
+}
+
+// ---------- SHARE FUNCTION ----------
+function share(){
+  const t = document.getElementById("msg").value.trim();
+  if(!t){
+    alert("Message likho");
+    return;
+  }
+  const link = location.origin + location.pathname + "?msg=" + encodeURIComponent(t);
+  if(navigator.share){
+    navigator.share({
+      title:"Shab-e-Barat Mubarak",
+      text:t,
+      url:link
+    });
+  }else{
+    alert("Is file ko Netlify / GitHub Pages par upload karo, phir share kaam karega");
+  }
+}
+
+// ---------- FIREWORKS ANIMATION ----------
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+class Particle{
+  constructor(x,y,color){
+    this.x=x;
+    this.y=y;
+    this.color=color;
+    this.radius=Math.random()*2+1;
+    this.vx=(Math.random()-0.5)*6;
+    this.vy=(Math.random()-0.5)*6;
+    this.alpha=1;
+  }
+  draw(){
+    ctx.globalAlpha=this.alpha;
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
+    ctx.fillStyle=this.color;
+    ctx.fill();
+  }
+  update(){
+    this.x+=this.vx;
+    this.y+=this.vy;
+    this.alpha-=0.02;
+  }
+}
+
+let particles = [];
+
+function createFirework(){
+  const x=Math.random()*canvas.width;
+  const y=Math.random()*canvas.height/2;
+  const colors=["gold","orange","red","yellow","white"];
+  for(let i=0;i<50;i++){
+    particles.push(new Particle(x,y,colors[Math.floor(Math.random()*colors.length)]));
+  }
+}
+
+function animate(){
+  ctx.fillStyle="rgba(0,0,0,0.2)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(let i=particles.length-1;i>=0;i--){
+    particles[i].update();
+    particles[i].draw();
+    if(particles[i].alpha<=0) particles.splice(i,1);
+  }
+  requestAnimationFrame(animate);
+}
+
+setInterval(createFirework,800);
+animate();
+
+window.addEventListener('resize',()=>{
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+});
+
+// ---------- SPARKLE EFFECT ----------
+function createSparkle(){
+  const sparkle = document.createElement('div');
+  sparkle.classList.add('sparkle');
+  sparkle.style.left = Math.random()*window.innerWidth + 'px';
+  sparkle.style.top = Math.random()*window.innerHeight + 'px';
+  document.body.appendChild(sparkle);
+  setTimeout(()=>{sparkle.remove();},1000);
+}
+
+setInterval(createSparkle,200);
+</script>
+
+</body>
+</html>
